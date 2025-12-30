@@ -1,0 +1,223 @@
+
+---
+
+# 🚀 DJANGO ORM (CORE CONCEPTS)
+
+We’ll practice ORM using your `CustomUser` model.
+
+Start shell if not already:
+
+```bash
+python manage.py shell
+```
+
+```python
+from users.models import CustomUser
+```
+
+---
+
+## 1️⃣ CREATE (Insert Data)
+
+### Method 1: `create()` (Most Common)
+
+```python
+user = CustomUser.objects.create(
+    username="john_doe",
+    first_name="John",
+    last_name="Doe",
+    email="john@example.com",
+    age=25
+)
+```
+
+✔ Saves immediately
+✔ Returns the object
+
+---
+
+### Method 2: `save()`
+
+```python
+user = CustomUser(
+    username="jane_doe",
+    first_name="Jane",
+    last_name="Doe",
+    email="jane@example.com"
+)
+user.save()
+```
+
+✔ Use when you want more control
+
+---
+
+## 2️⃣ READ (Fetch Data)
+
+### Get ALL records
+
+```python
+CustomUser.objects.all()
+```
+
+---
+
+### Get ONE record (⚠ must exist)
+
+```python
+CustomUser.objects.get(username="john_doe")
+```
+
+❌ Error if not found
+❌ Error if multiple found
+
+---
+
+### Filter records (SAFE)
+
+```python
+CustomUser.objects.filter(age=25)
+```
+
+✔ Returns QuerySet (can be empty)
+
+---
+
+### First / Last
+
+```python
+CustomUser.objects.first()
+CustomUser.objects.last()
+```
+
+---
+
+## 3️⃣ LOOKUPS (Filtering Power 🔥)
+
+```python
+CustomUser.objects.filter(username__icontains="doe")
+CustomUser.objects.filter(age__gte=18)
+CustomUser.objects.filter(age__lte=30)
+CustomUser.objects.filter(email__endswith="@example.com")
+```
+
+---
+
+## 4️⃣ UPDATE (Modify Data)
+
+### Update single object
+
+```python
+user = CustomUser.objects.get(username="john_doe")
+user.age = 26
+user.save()
+```
+
+---
+
+### Update multiple rows (FAST)
+
+```python
+CustomUser.objects.filter(age=25).update(age=26)
+```
+
+⚠ No `save()` called
+⚠ No signals triggered
+
+---
+
+## 5️⃣ DELETE (Remove Data)
+
+### Delete one object
+
+```python
+user = CustomUser.objects.get(username="jane_doe")
+user.delete()
+```
+
+---
+
+### Delete multiple objects
+
+```python
+CustomUser.objects.filter(age__lt=18).delete()
+```
+
+---
+
+## 6️⃣ COUNT / EXISTS
+
+```python
+CustomUser.objects.count()
+CustomUser.objects.filter(username="john_doe").exists()
+```
+
+---
+
+## 7️⃣ ORDERING (Override Meta)
+
+```python
+CustomUser.objects.order_by("username")
+CustomUser.objects.order_by("-age")
+```
+
+---
+
+## 8️⃣ VALUES & VALUES_LIST (Performance Tip)
+
+```python
+CustomUser.objects.values("username", "email")
+CustomUser.objects.values_list("username", flat=True)
+```
+
+✔ Faster
+✔ Returns dictionaries or lists
+
+---
+
+## 9️⃣ CHAINING QUERIES (Very Important)
+
+```python
+CustomUser.objects.filter(age__gte=18).filter(username__icontains="doe")
+```
+
+✔ Clean
+✔ Lazy execution
+
+---
+
+## 🔥 ORM GOLDEN RULES
+
+* QuerySets are **lazy**
+* Nothing hits DB until evaluated
+* Chaining is efficient
+* `filter()` is safer than `get()`
+
+---
+
+## 🧠 PRACTICE TASK (DO THIS NOW)
+
+Run these in shell:
+
+```python
+CustomUser.objects.create(
+    username="alex",
+    first_name="Alex",
+    last_name="Smith",
+    email="alex@example.com",
+    age=30
+)
+
+CustomUser.objects.filter(age__gte=25)
+CustomUser.objects.order_by("-age")
+```
+
+---
+
+## 🧭 WHERE YOU ARE NOW
+
+✔ Models
+✔ Migrations
+✔ ORM CRUD
+
+---

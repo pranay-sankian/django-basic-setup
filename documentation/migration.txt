@@ -1,0 +1,183 @@
+
+---
+
+# ✅ STEP 2: MIGRATIONS (VERY IMPORTANT)
+
+This step answers:
+
+* How does Django turn your model into a DB table?
+* What are migrations?
+* What commands to run and why?
+
+---
+
+## 1️⃣ What is a Migration?
+
+A **migration** is a Python file that:
+
+* Records changes in your models
+* Knows how to **create / modify / delete** database tables
+
+Think of it as:
+
+> **Version control for your database**
+
+---
+
+## 2️⃣ What Happens When You Create a Model?
+
+When you wrote:
+
+```python
+class CustomUser(models.Model):
+    ...
+```
+
+Right now:
+
+* ❌ No table exists in DB
+* ❌ Django hasn’t applied it yet
+
+Django needs **migrations** to do that.
+
+---
+
+## 3️⃣ Create Migration File
+
+Run:
+
+```bash
+python manage.py makemigrations
+```
+
+What Django does internally:
+
+1. Scans all `models.Model` classes
+2. Detects changes
+3. Creates a file like:
+
+```
+users/migrations/0001_initial.py
+```
+
+---
+
+## 4️⃣ What’s Inside a Migration File?
+
+Example (simplified):
+
+```python
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = []
+
+    operations = [
+        migrations.CreateModel(
+            name='CustomUser',
+            fields=[
+                ('id', models.BigAutoField(primary_key=True)),
+                ('username', models.CharField(max_length=50)),
+            ],
+        ),
+    ]
+```
+
+👉 This is Django saying:
+
+> “I know how to create this table.”
+
+---
+
+## 5️⃣ Apply Migration to Database
+
+Now run:
+
+```bash
+python manage.py migrate
+```
+
+What happens:
+
+* Django executes SQL
+* Table is created in DB
+* Migration is marked as applied
+
+---
+
+## 6️⃣ Verify Migration Worked
+
+### Option 1: Django Shell
+
+```bash
+python manage.py shell
+```
+
+```python
+from users.models import CustomUser
+CustomUser.objects.all()
+```
+
+✔ No error → table exists
+
+---
+
+### Option 2: Database
+
+Check table name:
+
+```
+users_customuser
+```
+
+---
+
+## 7️⃣ Common Migration Commands (Know These)
+
+| Command               | Purpose                 |
+| --------------------- | ----------------------- |
+| `makemigrations`      | Create migration files  |
+| `migrate`             | Apply migrations        |
+| `showmigrations`      | See applied migrations  |
+| `sqlmigrate app 0001` | See SQL before applying |
+
+---
+
+## 8️⃣ BEST PRACTICES (IMPORTANT)
+
+✅ Always run:
+
+```bash
+python manage.py makemigrations
+```
+
+before:
+
+```bash
+python manage.py migrate
+```
+
+❌ Never edit migration files manually (unless advanced)
+
+✅ Commit migration files to git
+
+---
+
+## 9️⃣ If Something Goes Wrong
+
+Undo last migration:
+
+```bash
+python manage.py migrate users zero
+```
+
+---
+
+## 🔥 YOU ARE HERE NOW
+
+✔ Model created
+✔ Next is migrations
+
+---
+

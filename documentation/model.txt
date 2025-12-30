@@ -1,0 +1,341 @@
+
+---
+
+# 📘 Django Model Documentation
+
+---
+
+## 1️⃣ What is a Django Model?
+
+A **Django model** is a Python class that:
+
+* Inherits from `models.Model`
+* Represents a **database table**
+* Each attribute represents a **column**
+* Each object represents a **row**
+
+```python
+from django.db import models
+
+class AppUser(models.Model):
+    username = models.CharField(max_length=50)
+```
+
+---
+
+## 2️⃣ Why Inherit from `models.Model`?
+
+```python
+class AppUser(models.Model):
+```
+
+This tells Django:
+
+* Create a database table
+* Enable ORM features
+* Track migrations
+
+Without this → Django ignores the class.
+
+---
+
+## 3️⃣ Common Model Fields (Most Used)
+
+### 🔹 Text Fields
+
+```python
+models.CharField(max_length=100)
+models.TextField()
+```
+
+### 🔹 Numbers
+
+```python
+models.IntegerField()
+models.PositiveIntegerField()
+models.FloatField()
+models.DecimalField(max_digits=10, decimal_places=2)
+```
+
+### 🔹 Dates & Time
+
+```python
+models.DateTimeField(auto_now_add=True)
+models.DateTimeField(auto_now=True)
+models.DateField()
+models.TimeField()
+```
+
+### 🔹 Boolean
+
+```python
+models.BooleanField(default=False)
+```
+
+### 🔹 Email & URLs
+
+```python
+models.EmailField()
+models.URLField()
+```
+
+---
+
+## 4️⃣ Field Options (VERY IMPORTANT)
+
+| Option          | Meaning                             |
+| --------------- | ----------------------------------- |
+| `null=True`     | Allows NULL in DB                   |
+| `blank=True`    | Allows empty form input             |
+| `default=value` | Default value                       |
+| `unique=True`   | Enforces uniqueness                 |
+| `max_length`    | Max length (required for CharField) |
+| `choices=[]`    | Predefined choices                  |
+| `db_index=True` | Creates DB index                    |
+
+### Example:
+
+```python
+email = models.EmailField(unique=True, db_index=True)
+```
+
+---
+
+## 5️⃣ Relationships Between Models
+
+### 🔹 ForeignKey (Many-to-One)
+
+```python
+models.ForeignKey(User, on_delete=models.CASCADE)
+```
+
+### 🔹 OneToOne
+
+```python
+models.OneToOneField(User, on_delete=models.CASCADE)
+```
+
+### 🔹 ManyToMany
+
+```python
+models.ManyToManyField(Group)
+```
+
+---
+
+## 6️⃣ Model Methods
+
+### `__str__()`
+
+```python
+def __str__(self):
+    return self.username
+```
+
+Used for:
+
+* Admin display
+* Debugging
+* Logging
+
+---
+
+### Custom Methods
+
+```python
+def full_name(self):
+    return f"{self.first_name} {self.last_name}"
+```
+
+---
+
+## 7️⃣ What is `class Meta`?
+
+`Meta` is an **inner class** used to define **model-level configuration**.
+
+```python
+class Meta:
+    ordering = ['-created_at']
+```
+
+It does NOT create DB fields.
+
+---
+
+## 8️⃣ `Meta` Options (COMPLETE & PRACTICAL)
+
+---
+
+### 🔹 `ordering`
+
+Default ordering for querysets
+
+```python
+ordering = ['-created_at']
+```
+
+---
+
+### 🔹 `verbose_name`
+
+Human-readable singular name
+
+```python
+verbose_name = "User"
+```
+
+---
+
+### 🔹 `verbose_name_plural`
+
+Plural name for admin
+
+```python
+verbose_name_plural = "Users"
+```
+
+---
+
+### 🔹 `db_table`
+
+Custom database table name
+
+```python
+db_table = "app_users"
+```
+
+---
+
+### 🔹 `indexes`
+
+Create database indexes
+
+```python
+indexes = [
+    models.Index(fields=['email']),
+]
+```
+
+---
+
+### 🔹 `constraints`
+
+Database-level constraints
+
+```python
+constraints = [
+    models.UniqueConstraint(
+        fields=['email'],
+        name='unique_email_constraint'
+    )
+]
+```
+
+---
+
+### 🔹 `unique_together` (Deprecated ⚠️)
+
+Use `constraints` instead
+
+```python
+unique_together = ('email', 'username')
+```
+
+---
+
+### 🔹 `permissions`
+
+Custom permissions
+
+```python
+permissions = [
+    ("can_view_users", "Can view users")
+]
+```
+
+---
+
+### 🔹 `default_permissions`
+
+Override default permissions
+
+```python
+default_permissions = ('add', 'change', 'delete')
+```
+
+---
+
+### 🔹 `abstract`
+
+Used in abstract base models
+
+```python
+abstract = True
+```
+
+---
+
+### 🔹 `managed`
+
+Control Django DB management
+
+```python
+managed = False
+```
+
+---
+
+### 🔹 `get_latest_by`
+
+Used with `latest()`
+
+```python
+get_latest_by = "created_at"
+```
+
+---
+
+## 9️⃣ Full Example (Best Practice Model)
+
+```python
+from django.db import models
+
+
+class AppUser(models.Model):
+    username = models.CharField(max_length=50, unique=True)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    email = models.EmailField(unique=True)
+    age = models.PositiveIntegerField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "User"
+        verbose_name_plural = "Users"
+        db_table = "app_users"
+        indexes = [
+            models.Index(fields=['email']),
+        ]
+
+    def __str__(self):
+        return self.username
+```
+
+---
+
+## 🔟 Key Takeaways (Memorize This)
+
+| Concept        | Purpose                |
+| -------------- | ---------------------- |
+| `models.Model` | Makes class a DB model |
+| Fields         | DB columns             |
+| Methods        | Object behavior        |
+| `Meta`         | Model configuration    |
+| `ordering`     | Default sorting        |
+| `verbose_name` | Admin display          |
+
+---
+
