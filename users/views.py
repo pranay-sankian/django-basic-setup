@@ -1,6 +1,10 @@
 from rest_framework.response import Response
 from rest_framework.decorators import action
+# Used to create custom endpoints inside a ViewSet.
+
 from rest_framework.viewsets import ModelViewSet
+# Gives us CRUD APIs automatically.
+
 from .models import CustomUser
 from .serializer import CustomUserSerilizer
 

@@ -8,8 +8,7 @@ class CustomUserSerilizer (serializers.ModelSerializer):
         model = CustomUser
         fields = '__all__'
         
-# __all__ => 
-# actually does internally
+# __all__ => what actually does internally
 # Django REST Framework:
 # Reads model fields
 # Maps them to serializer fields

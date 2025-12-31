@@ -34,7 +34,7 @@ class UserListAPI(APIView):
         paginated_users = paginator.paginate_queryset(users, request)
 
         # serializer = UserSerializer(users, many=True)
-        serializer = UserSerializer(paginated_users, many=True)
+        serializer = UserSerializer(paginated_users, many=True) # getting the list so many=true
 
         message = "Users fetched successfully" if users.exists() else "No User found"
 
@@ -51,8 +51,6 @@ class UserListAPI(APIView):
             status_code=status.HTTP_200_OK,
         )
 
-
-class UserDetailAPI(APIView):
     # create a new user
     def post(self, request):
         serializer = UserCreateSerializer(data=request.data)
@@ -73,6 +71,8 @@ class UserDetailAPI(APIView):
             data=serializer.errors,
         )
 
+
+class UserDetailAPI(APIView):
     # get user by Id
     def get(self, request, id):
         try:
