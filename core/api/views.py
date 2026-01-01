@@ -9,9 +9,18 @@ from .utils import api_response
 
 from .pagination import UserPagination
 
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class UserListAPI(APIView):
     def get(self, request):
+        if not request.user.is_superuser and request.user.id != id:
+            return api_response(
+                success=False,
+                message="You do not have permission to access this user",
+                status_code=403,
+            )
+
         users = User.objects.all()
 
         # filters based on the email, first name and the last name
@@ -34,7 +43,9 @@ class UserListAPI(APIView):
         paginated_users = paginator.paginate_queryset(users, request)
 
         # serializer = UserSerializer(users, many=True)
-        serializer = UserSerializer(paginated_users, many=True) # getting the list so many=true
+        serializer = UserSerializer(
+            paginated_users, many=True
+        )  # getting the list so many=true
 
         message = "Users fetched successfully" if users.exists() else "No User found"
 
@@ -53,6 +64,13 @@ class UserListAPI(APIView):
 
     # create a new user
     def post(self, request):
+        if not request.user.is_superuser and request.user.id != id:
+            return api_response(
+                success=False,
+                message="You do not have permission to access this user",
+                status_code=403,
+            )
+
         serializer = UserCreateSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -73,27 +91,44 @@ class UserListAPI(APIView):
 
 
 class UserDetailAPI(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     # get user by Id
+    # request.user is cheked here id=id
     def get(self, request, id):
+        if not request.user.is_superuser and request.user.id != id:
+            return api_response(
+                success=False,
+                message="You do not have permission to access this user",
+                status_code=403,
+            )
+
         try:
             user = User.objects.get(id=id)
         except User.DoesNotExist:
             return api_response(
                 success=False,
                 message="User not Found",
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=404,
             )
 
         serializer = UserSerializer(user)
         return api_response(
             success=True,
-            message="User fetch successfully",
+            message="User fetched successfully",
             data=serializer.data,
-            status_code=status.HTTP_200_OK,
+            status_code=200,
         )
 
     # update user by id (partial)
     def put(self, request, id):
+        if not request.user.is_superuser and request.user.id != id:
+            return api_response(
+                success=False,
+                message="You do not have permission",
+                status_code=403,
+            )
 
         user = User.objects.get(id=id)
 
@@ -102,7 +137,9 @@ class UserDetailAPI(APIView):
         if serializer.is_valid():
             serializer.save()
             return api_response(
-                success=True, message="User updated successfully", data=serializer.data
+                success=True,
+                message="User updated successfully",
+                data=serializer.data,
             )
 
         return api_response(
@@ -114,6 +151,14 @@ class UserDetailAPI(APIView):
 
     # delete user by id
     def delete(self, request, id):
+
+        if not request.user.is_superuser and request.user.id != id:
+            return api_response(
+                success=False,
+                message="You do not have permission",
+                status_code=403,
+            )
+
         try:
             user = User.objects.get(id=id)
             user.delete()

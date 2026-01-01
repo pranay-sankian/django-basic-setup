@@ -33,11 +33,11 @@ class CustomUser(models.Model):
     def __str__(self):
         return self.username
 
-    # class Meta:
-    #     ordering = ["-created_at"]  # descending order
-    #     verbose_name = "User"
-    #     verbose_name_plural = "Users"
-    #     db_table = "app_users"
+    class Meta:
+        ordering = ["-created_at"]  # descending order
+        verbose_name = "User"
+        verbose_name_plural = "Users"
+        db_table = "app_users"
 
 
 # __method_name__() => dunder methods -> it automatically called by python

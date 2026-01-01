@@ -20,9 +20,16 @@ def custom_exception_handler(exc, context):
         )
 
     if isinstance(exc, AuthenticationFailed):
+        # Check if this is from /token endpoint
+        request = context.get("request")
+        if request and request.path.endswith("/token/"):
+            message = "Invalid username or password"
+        else:
+            message = "Invalid or expired authentication token"
+
         return api_response(
             success=False,
-            message="Invalid or expired authentication token",
+            message=message,
             status_code=status.HTTP_401_UNAUTHORIZED,
         )
 
